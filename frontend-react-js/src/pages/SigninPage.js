@@ -4,7 +4,7 @@ import {ReactComponent as Logo} from '../components/svg/logo.svg';
 import { Link } from "react-router-dom";
 
 // Cognito
-import { signIn } from 'aws-amplify/auth';
+import { signIn,fetchAuthSession } from 'aws-amplify/auth';
 
 export default function SigninPage() {
 
@@ -13,22 +13,37 @@ export default function SigninPage() {
   const [errors, setErrors] = React.useState('');
 
   const onsubmit = async (event) => {
-    setErrors('')
+    setErrors('');
     event.preventDefault();
-    signIn({ username: email, password })
-    .then(user => {
-      console.log('user',user)
-      localStorage.setItem("access_token", user.signInUserSession.accessToken.jwtToken)
-      window.location.href = "/"
-    })
-    .catch(error => { 
-      if (error.code == 'UserNotConfirmedException') {
-        window.location.href = "/confirm"
+    try {
+      const { isSignedIn, nextStep } = await signIn({
+        username: email,
+        password,
+      });
+      if (isSignedIn) {
+        const session = await fetchAuthSession();
+        const accessToken = session.tokens?.accessToken?.toString();
+        if (accessToken) {
+          localStorage.setItem('access_token', accessToken);
+          window.location.href = '/';
+        } else {
+          setErrors('Unable to get access token');
+        }
+      } else if (nextStep?.signInStep === 'CONFIRM_SIGN_UP') {
+        window.location.href = '/confirm';
+      } else {
+        console.log('Next step:', nextStep);
+        setErrors('Additional step required for sign-in');
       }
-      setErrors(error.message)
-    });
-    return false
-  }
+    } catch (error) {
+      if (error.name === 'UserNotConfirmedException') {
+        window.location.href = '/confirm';
+      } else {
+        console.error('Login error:', error);
+        setErrors(error.message || 'Login failed');
+      }
+    }
+  };
 
   const email_onchange = (event) => {
     setEmail(event.target.value);

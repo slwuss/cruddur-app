@@ -9,7 +9,7 @@ import ReplyForm from '../components/ReplyForm';
 
 
 // Cognito
-import { getCurrentUser } from 'aws-amplify/auth';
+import { getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
 
 
 export default function HomeFeedPage() {
@@ -38,22 +38,20 @@ export default function HomeFeedPage() {
   };
 
   const checkAuth = async () => {
-    getCurrentUser({
-      // Optional, By default is false. 
-      // If set to true, this call will send a 
-      // request to Cognito to get the latest user data
-      bypassCache: false 
-    })
-    .then((user) => {
-      console.log('user',user);
-      return getCurrentUser()
-    }).then((cognito_user) => {
-        setUser({
-          display_name: cognito_user.attributes.name,
-          handle: cognito_user.attributes.preferred_username
-        })
-    })
-    .catch((err) => console.log(err));
+    try {
+      const user = await getCurrentUser();
+      const attributes = await fetchUserAttributes();
+
+      console.log("user", user);
+      console.log("attributes", attributes);
+
+      setUser({
+        display_name: attributes.name || user.username,
+        handle: attributes.preferred_username || user.username,
+      });
+    } catch (err) {
+      console.log("Auth error:", err);
+    }
   };
 
   React.useEffect(()=>{
