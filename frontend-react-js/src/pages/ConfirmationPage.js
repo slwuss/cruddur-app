@@ -1,107 +1,129 @@
 import './ConfirmationPage.css';
 import React from "react";
-import { useParams } from 'react-router-dom';
-import {ReactComponent as Logo} from '../components/svg/logo.svg';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { ReactComponent as Logo } from '../components/svg/logo.svg';
 
-// [TODO] Authenication
-import Cookies from 'js-cookie'
+
+import { confirmSignUp, resendSignUpCode } from 'aws-amplify/auth';
 
 export default function ConfirmationPage() {
   const [email, setEmail] = React.useState('');
   const [code, setCode] = React.useState('');
   const [errors, setErrors] = React.useState('');
   const [codeSent, setCodeSent] = React.useState(false);
+  const [success, setSuccess] = React.useState(false);
 
-  const params = useParams();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
-  const code_onchange = (event) => {
-    setCode(event.target.value);
-  }
-  const email_onchange = (event) => {
-    setEmail(event.target.value);
-  }
+ 
+  React.useEffect(() => {
+    const queryEmail = searchParams.get('email');
+    if (queryEmail) setEmail(queryEmail);
+  }, [searchParams]);
 
-  const resend_code = async (event) => {
-    console.log('resend_code')
-    // [TODO] Authenication
-  }
-
-  const onsubmit = async (event) => {
+  
+  const onSubmit = async (event) => {
     event.preventDefault();
-    console.log('ConfirmationPage.onsubmit')
-    // [TODO] Authenication
-    if (Cookies.get('user.email') === undefined || Cookies.get('user.email') === '' || Cookies.get('user.email') === null){
-      setErrors("You need to provide an email in order to send Resend Activiation Code")   
-    } else {
-      if (Cookies.get('user.email') === email){
-        if (Cookies.get('user.confirmation_code') === code){
-          Cookies.set('user.logged_in',true)
-          window.location.href = "/"
-        } else {
-          setErrors("Code is not valid")
-        }
-      } else {
-        setErrors("Email is invalid or cannot be found.")   
+    setErrors('');
+    setSuccess(false);
+
+    try {
+      if (!email || !code) {
+        setErrors("Please enter both email and confirmation code");
+        return;
       }
+
+      const result = await confirmSignUp({
+        username: email, 
+        confirmationCode: code,
+      });
+
+      console.log("Confirm result:", result);
+
+      if (result.isSignUpComplete) {
+        setSuccess(true);
+        navigate('/signin');
+      } else {
+        setErrors("Confirmation incomplete. Please try again.");
+      }
+    } catch (error) {
+      console.error("Confirmation error:", error);
+      setErrors(error.message || "Failed to confirm sign up");
     }
-    return false
-  }
-
-  let el_errors;
-  if (errors){
-    el_errors = <div className='errors'>{errors}</div>;
-  }
+  };
 
 
-  let code_button;
-  if (codeSent){
-    code_button = <div className="sent-message">A new activation code has been sent to your email</div>
-  } else {
-    code_button = <button className="resend" onClick={resend_code}>Resend Activation Code</button>;
-  }
+  const resendCode = async (event) => {
+    event.preventDefault();
+    setErrors('');
+    setCodeSent(false);
 
-  React.useEffect(()=>{
-    if (params.email) {
-      setEmail(params.email)
+    try {
+      if (!email) {
+        setErrors("Please enter your email to resend code");
+        return;
+      }
+
+      await resendSignUpCode({ username: email });
+      setCodeSent(true);
+      console.log("Resent confirmation code to", email);
+    } catch (error) {
+      console.error("Resend error:", error);
+      setErrors(error.message || "Failed to resend code");
     }
-  }, [])
+  };
 
   return (
     <article className="confirm-article">
       <div className='recover-info'>
         <Logo className='logo' />
       </div>
+
       <div className='recover-wrapper'>
-        <form
-          className='confirm_form'
-          onSubmit={onsubmit}
-        >
+        <form className='confirm_form' onSubmit={onSubmit}>
           <h2>Confirm your Email</h2>
+
           <div className='fields'>
             <div className='field text_field email'>
               <label>Email</label>
               <input
-                type="text"
+                type="email"
                 value={email}
-                onChange={email_onchange} 
+                onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </div>
+
             <div className='field text_field code'>
               <label>Confirmation Code</label>
               <input
                 type="text"
                 value={code}
-                onChange={code_onchange} 
+                onChange={(e) => setCode(e.target.value)}
+                required
               />
             </div>
           </div>
-          {el_errors}
+
+          {errors && <div className='errors'>{errors}</div>}
+          {success && <div className='success'>Email confirmed successfully! You can now sign in.</div>}
+
           <div className='submit'>
             <button type='submit'>Confirm Email</button>
           </div>
         </form>
+
+        <div className="resend-section">
+          {codeSent ? (
+            <div className="sent-message">✅ A new activation code has been sent to your email</div>
+          ) : (
+            <button className="resend" onClick={resendCode}>
+              Resend Activation Code
+            </button>
+          )}
+        </div>
       </div>
-      {code_button}
     </article>
   );
 }

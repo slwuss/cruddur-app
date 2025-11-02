@@ -1,12 +1,11 @@
 import './SignupPage.css';
 import React from "react";
-import {ReactComponent as Logo} from '../components/svg/logo.svg';
-import { Link } from "react-router-dom";
-
-// [TODO] Authenication
-import Cookies from 'js-cookie'
+import { ReactComponent as Logo } from '../components/svg/logo.svg';
+import { Link, useNavigate } from "react-router-dom";
+import { signUp } from 'aws-amplify/auth';
 
 export default function SignupPage() {
+  const navigate = useNavigate();
 
   // Username is Eamil
   const [name, setName] = React.useState('');
@@ -15,36 +14,31 @@ export default function SignupPage() {
   const [password, setPassword] = React.useState('');
   const [errors, setErrors] = React.useState('');
 
-  const onsubmit = async (event) => {
+  const onSubmit = async (event) => {
     event.preventDefault();
-    console.log('SignupPage.onsubmit')
-    // [TODO] Authenication
-    Cookies.set('user.name', name)
-    Cookies.set('user.username', username)
-    Cookies.set('user.email', email)
-    Cookies.set('user.password', password)
-    Cookies.set('user.confirmation_code',1234)
-    window.location.href = `/confirm?email=${email}`
-    return false
-  }
+    setErrors('');
 
-  const name_onchange = (event) => {
-    setName(event.target.value);
-  }
-  const email_onchange = (event) => {
-    setEmail(event.target.value);
-  }
-  const username_onchange = (event) => {
-    setUsername(event.target.value);
-  }
-  const password_onchange = (event) => {
-    setPassword(event.target.value);
-  }
+    try {
+      const { userId, nextStep, isSignUpComplete } = await signUp({
+        username, 
+        password,
+        options: {
+          userAttributes: {
+            name,
+            email,
+            preferred_username: username,
+          },
+          autoSignIn: true,
+        },
+      });
 
-  let el_errors;
-  if (errors){
-    el_errors = <div className='errors'>{errors}</div>;
-  }
+      console.log('Signup success:', { userId, nextStep, isSignUpComplete });
+      navigate(`/confirm?email=${email}`);
+    } catch (error) {
+      console.error('Signup error:', error);
+      setErrors(error.message || 'Signup failed');
+    }
+  };
 
   return (
     <article className='signup-article'>
@@ -52,57 +46,40 @@ export default function SignupPage() {
         <Logo className='logo' />
       </div>
       <div className='signup-wrapper'>
-        <form 
-          className='signup_form'
-          onSubmit={onsubmit}
-        >
+        <form className='signup_form' onSubmit={onSubmit}>
           <h2>Sign up to create a Cruddur account</h2>
+
           <div className='fields'>
             <div className='field text_field name'>
               <label>Name</label>
-              <input
-                type="text"
-                value={name}
-                onChange={name_onchange} 
-              />
+              <input type="text" value={name} onChange={e => setName(e.target.value)} />
             </div>
 
             <div className='field text_field email'>
               <label>Email</label>
-              <input
-                type="text"
-                value={email}
-                onChange={email_onchange} 
-              />
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} />
             </div>
 
             <div className='field text_field username'>
               <label>Username</label>
-              <input
-                type="text"
-                value={username}
-                onChange={username_onchange} 
-              />
+              <input type="text" value={username} onChange={e => setUsername(e.target.value)} />
             </div>
 
             <div className='field text_field password'>
               <label>Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={password_onchange} 
-              />
+              <input type="password" value={password} onChange={e => setPassword(e.target.value)} />
             </div>
           </div>
-          {el_errors}
+
+          {errors && <div className='errors'>{errors}</div>}
+
           <div className='submit'>
             <button type='submit'>Sign Up</button>
           </div>
         </form>
+
         <div className="already-have-an-account">
-          <span>
-            Already have an account?
-          </span>
+          <span>Already have an account?</span>
           <Link to="/signin">Sign in!</Link>
         </div>
       </div>

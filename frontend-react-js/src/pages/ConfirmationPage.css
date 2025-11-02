@@ -16,13 +16,16 @@ article.confirm-article {
 
 article.confirm-article .recover-wrapper {
   background: #202124;
-  width: 560px;
+  width: 720px; 
   border-radius: 12px;
   display: flex;
   flex-direction: column;
+  margin-top: 80px;
+  box-shadow: 0 0 24px rgba(0,0,0,0.3);
 }
+
 article.confirm-article form {
-  padding: 48px;
+  padding: 48px 120px;
   flex-grow: 1;
 }
 
@@ -33,15 +36,14 @@ article.confirm-article label {
 }
 
 article.confirm-article input[type='text'],
-article.confirm-article input[type='password'] {
+article.confirm-article input[type='password'],
+article.confirm-article input[type='email'] {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;
   border-radius: 4px;
   border: none;
   outline: none;
   display: block;
-  outline: none;
-  resize: none;
   width: 100%;
   padding: 16px;
   border: solid 1px #555555;
@@ -53,20 +55,18 @@ article.confirm-article input[type='password'] {
   margin-top: 16px;
 }
 
-article.confirm-article input[type='text']:focus ,
-article.confirm-article input[type='password']:focus {
+article.confirm-article input:focus {
   border: solid 1px rgb(149,0,255,1);
 }
 
 article.confirm-article .submit {
   margin-top: 24px;
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
 }
 
-article.confirm-article  h2 {
+article.confirm-article h2 {
   text-align: center;
   color: #fff;
   margin-top: 0;
@@ -81,6 +81,23 @@ article.confirm-article button[type='submit'] {
   font-size: 16px;
   background: rgba(149,0,255,1);
   color: #fff;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+article.confirm-article button[type='submit']:hover {
+  background: rgba(149,0,255,0.8);
+}
+
+
+.resend-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  background: rgba(149,0,255,0.8);
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
 }
 
 article.confirm-article button.resend {
@@ -88,20 +105,48 @@ article.confirm-article button.resend {
   outline: none;
   border: none;
   border-radius: 6px;
-  padding: 18px 28px;
+  padding: 14px 24px;
   font-size: 16px;
   background: #562397;
   color: #fff;
-  margin-top: 24px;
   cursor: pointer;
+  transition: background 0.2s ease;
 }
+
 article.confirm-article button.resend:hover {
   background: #451782;
 }
 
-article.confirm-article .sent-message {
-  margin-top: 24px;
-  font-size: 18px;
-  font-weight: 600;
-  color: rgba(0,0,0,0.7)
+
+
+/* 🔹 Message Styles */
+.errors {
+  padding: 16px;
+  border-radius: 8px;
+  background: rgba(255,0,0,0.3);
+  color: rgb(255,255,255);
+  margin-top: 16px;
+  font-size: 14px;
+}
+
+.success {
+  padding: 16px;
+  border-radius: 8px;
+  background: rgba(0,200,0,0.3);
+  color: #fff;
+  margin-top: 16px;
+  font-size: 14px;
+}
+
+.sent-message {
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.8);
+  text-align: center;
+}
+
+article.confirm-article input[readonly] {
+  background: #2a2a2a;
+  color: rgba(255,255,255,0.5);
+  cursor: not-allowed;
 }
