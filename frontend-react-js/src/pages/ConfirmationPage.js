@@ -90,7 +90,7 @@ export default function ConfirmationPage() {
               <input
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                readOnly
                 required
               />
             </div>
@@ -113,7 +113,7 @@ export default function ConfirmationPage() {
             <button type='submit'>Confirm Email</button>
           </div>
         </form>
-
+      </div>
         <div className="resend-section">
           {codeSent ? (
             <div className="sent-message">✅ A new activation code has been sent to your email</div>
@@ -123,7 +123,6 @@ export default function ConfirmationPage() {
             </button>
           )}
         </div>
-      </div>
     </article>
   );
 }
