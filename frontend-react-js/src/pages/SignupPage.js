@@ -7,7 +7,7 @@ import { signUp } from 'aws-amplify/auth';
 export default function SignupPage() {
   const navigate = useNavigate();
 
-  // Username is Eamil
+ 
   const [name, setName] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [username, setUsername] = React.useState('');
@@ -20,7 +20,7 @@ export default function SignupPage() {
 
     try {
       const { userId, nextStep, isSignUpComplete } = await signUp({
-        username, 
+        username,
         password,
         options: {
           userAttributes: {
@@ -33,7 +33,7 @@ export default function SignupPage() {
       });
 
       console.log('Signup success:', { userId, nextStep, isSignUpComplete });
-      navigate(`/confirm?email=${email}`);
+      navigate(`/confirm?username=${username}&email=${email}`);
     } catch (error) {
       console.error('Signup error:', error);
       setErrors(error.message || 'Signup failed');

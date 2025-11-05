@@ -70,7 +70,7 @@ export default function SigninPage() {
           <h2>Sign into your Cruddur account</h2>
           <div className='fields'>
             <div className='field text_field username'>
-              <label>Email</label>
+              <label>Email or Username</label>
               <input
                 type="text"
                 value={email}

@@ -7,26 +7,40 @@ import { ReactComponent as Logo } from '../components/svg/logo.svg';
 import { confirmSignUp, resendSignUpCode } from 'aws-amplify/auth';
 
 export default function ConfirmationPage() {
+  const [username, setUsername] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [code, setCode] = React.useState('');
   const [errors, setErrors] = React.useState('');
   const [codeSent, setCodeSent] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
+  const [cooldown, setCooldown] = React.useState(0);
 
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
  
   React.useEffect(() => {
-    const queryEmail = searchParams.get('email');
-    if (queryEmail) setEmail(queryEmail);
+  const queryUsername = searchParams.get('username');
+  const queryEmail = searchParams.get('email');
+  if (queryUsername) setUsername(queryUsername);
+  if (queryEmail) setEmail(queryEmail);
   }, [searchParams]);
 
+  React.useEffect(() => {
+  if (cooldown > 0) {
+    const timer = setTimeout(() => setCooldown(cooldown - 1), 1000);
+    return () => clearTimeout(timer);
+  }
+  }, [cooldown]);
   
   const onSubmit = async (event) => {
     event.preventDefault();
     setErrors('');
     setSuccess(false);
+
+    console.log('Attempting to confirm email:', email);
+    console.log('Confirming for username:', username);
+    console.log('Code entered:', code);
 
     try {
       if (!email || !code) {
@@ -35,7 +49,7 @@ export default function ConfirmationPage() {
       }
 
       const result = await confirmSignUp({
-        username: email, 
+        username:username, 
         confirmationCode: code,
       });
 
@@ -60,19 +74,21 @@ export default function ConfirmationPage() {
     setCodeSent(false);
 
     try {
-      if (!email) {
-        setErrors("Please enter your email to resend code");
-        return;
-      }
+        if (!username) {
+          setErrors("Missing username — please sign up again or check your link.");
+          return;
+        }
 
-      await resendSignUpCode({ username: email });
-      setCodeSent(true);
-      console.log("Resent confirmation code to", email);
-    } catch (error) {
-      console.error("Resend error:", error);
-      setErrors(error.message || "Failed to resend code");
-    }
-  };
+        await resendSignUpCode({ username });
+        setCodeSent(true);
+        setCooldown(60);
+        setTimeout(() => setCodeSent(false), 60000);
+        console.log("Resent confirmation code to", email);
+      } catch (error) {
+        console.error("Resend error:", error);
+        setErrors(error.message || "Failed to resend code");
+      }
+    };
 
   return (
     <article className="confirm-article">
@@ -115,8 +131,17 @@ export default function ConfirmationPage() {
         </form>
       </div>
         <div className="resend-section">
-          {codeSent ? (
-            <div className="sent-message">✅ A new activation code has been sent to your email</div>
+          {cooldown > 0 ? (
+            <>
+              {codeSent && (
+                <div className="sent-message">
+                  A new activation code has been sent to your email
+                </div>
+              )}
+              <div className="cooldown-message">
+                You can resend the code in {cooldown}s
+              </div>
+            </>
           ) : (
             <button className="resend" onClick={resendCode}>
               Resend Activation Code
