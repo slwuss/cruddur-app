@@ -6,3 +6,6 @@ opentelemetry-distro
 opentelemetry-exporter-otlp
 
 aws-xray-sdk
+
+requests
+python-jose[cryptography]

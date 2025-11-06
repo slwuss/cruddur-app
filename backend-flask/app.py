@@ -1,7 +1,10 @@
-from flask import Flask
+from functools import wraps
 from flask import request
+from flask import Flask
+from flask import jsonify
 from flask_cors import CORS, cross_origin
 import os
+import requests
 
 from services.home_activities import *
 from services.notifications_activities import *
@@ -17,6 +20,8 @@ from services.show_activity import *
 from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.ext.flask.middleware import XRayMiddleware
 
+from auth.jwt_helper import jwt_required
+
 xray_url = os.getenv("AWS_XRAY_URL")
 xray_recorder.configure(service='Cruddur', dynamic_naming=xray_url)
 
@@ -28,13 +33,15 @@ XRayMiddleware(app, xray_recorder)
 frontend = os.getenv('FRONTEND_URL')
 backend = os.getenv('BACKEND_URL')
 origins = [frontend, backend]
+
 cors = CORS(
   app, 
   resources={r"/api/*": {"origins": origins}},
-  expose_headers="location,link",
-  allow_headers="content-type,if-modified-since",
+  headers=['Content-Type', 'Authorization'], 
+  expose_headers='Authorization',
   methods="OPTIONS,GET,HEAD,POST"
 )
+
 
 @app.route("/api/message_groups", methods=['GET'])
 def data_message_groups():
@@ -72,6 +79,7 @@ def data_create_message():
   return
 
 @app.route("/api/activities/home", methods=['GET'])
+@jwt_required
 def data_home():
   data = HomeActivities.run()
   return data, 200
