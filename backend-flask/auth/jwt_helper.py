@@ -6,12 +6,14 @@ from jose import jwt
 from jose.exceptions import JWTError, ExpiredSignatureError
 
 
-COGNITO_REGION = os.getenv("COGNITO_REGION", "ap-southeast-2")
-COGNITO_USER_POOL_ID = os.getenv("COGNITO_USER_POOL_ID", "ap-southeast-2_s92MIhNaz")
-COGNITO_CLIENT_ID = os.getenv("COGNITO_CLIENT_ID", "10airlpdi0n03qbipu48c61j87")
+COGNITO_REGION = os.getenv("COGNITO_REGION")
+COGNITO_USER_POOL_ID = os.getenv("COGNITO_USER_POOL_ID")
+COGNITO_CLIENT_ID = os.getenv("COGNITO_CLIENT_ID")
 
 JWKS_URL = f"https://cognito-idp.{COGNITO_REGION}.amazonaws.com/{COGNITO_USER_POOL_ID}/.well-known/jwks.json"
 ISSUER = f"https://cognito-idp.{COGNITO_REGION}.amazonaws.com/{COGNITO_USER_POOL_ID}"
+
+
 
 
 jwks = requests.get(JWKS_URL).json()
