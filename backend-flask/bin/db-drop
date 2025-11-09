@@ -1,0 +1,6 @@
+#! /usr/bin/bash
+
+echo "db-drop"
+
+NO_DB_CONNECTION_URL=$(echo "$CONNECTION_URL" | sed 's|/cruddur|/postgres|')
+psql $NO_DB_CONNECTION_URL -c "DROP DATABASE IF EXISTS cruddur;"
