@@ -20,7 +20,8 @@ from services.show_activity import *
 from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.ext.flask.middleware import XRayMiddleware
 
-from auth.jwt_helper import jwt_required
+from lib.jwt_helper import jwt_required
+from lib.db import pool
 
 xray_url = os.getenv("AWS_XRAY_URL")
 xray_recorder.configure(service='Cruddur', dynamic_naming=xray_url)

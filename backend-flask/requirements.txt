@@ -9,3 +9,6 @@ aws-xray-sdk
 
 requests
 python-jose[cryptography]
+
+psycopg[binary]
+psycopg[pool]
