@@ -8,7 +8,7 @@ printf "${CYAN}==== ${LABEL}${NO_COLOR}\n"
 
 script_path="$(realpath .)/script"
 
-source "$script_path/db-drop"
-source "$script_path/db-create"
-source "$script_path/db-schema-load"
-source "$script_path/db-seed"
+source "$script_path/db/drop"
+source "$script_path/db/create"
+source "$script_path/db/schema-load"
+source "$script_path/db/seed"
