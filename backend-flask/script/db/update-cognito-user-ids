@@ -24,7 +24,7 @@ def update_users_with_cognito_user_id(handle,sub):
   })
 
 def get_cognito_user_ids():
-  userpool_id = os.getenv("AWS_COGNITO_USER_POOL_ID")
+  userpool_id = os.getenv("COGNITO_USER_POOL_ID")
   client = boto3.client('cognito-idp')
   params = {
     'UserPoolId': userpool_id,
@@ -40,6 +40,9 @@ def get_cognito_user_ids():
     attrs = user['Attributes']
     sub    = next((a for a in attrs if a["Name"] == 'sub'), None)
     handle = next((a for a in attrs if a["Name"] == 'preferred_username'), None)
+    if sub is None or handle is None:
+        print("Skipping user due to missing attributes:", {'Username': user.get('Username')})
+        continue
     dict_users[handle['Value']] = sub['Value']
   return dict_users
 

@@ -75,3 +75,8 @@ def jwt_required(func):
         request.user = claims
         return func(*args, **kwargs)
     return wrapper
+
+
+
+
+

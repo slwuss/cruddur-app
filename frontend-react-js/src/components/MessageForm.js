@@ -17,14 +17,12 @@ export default function ActivityForm(props) {
   const onsubmit = async (event) => {
     event.preventDefault();
     try {
+      const token = localStorage.getItem('access_token');
       const backend_url = `${process.env.REACT_APP_BACKEND_URL}/api/messages`
       console.log('onsubmit payload', message)
       const res = await fetch(backend_url, {
         method: "POST",
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
+        headers: { Authorization: `Bearer ${token}` },
         body: JSON.stringify({
           message: message,
           user_receiver_handle: params.handle
