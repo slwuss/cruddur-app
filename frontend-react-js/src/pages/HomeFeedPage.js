@@ -6,10 +6,7 @@ import DesktopSidebar     from '../components/DesktopSidebar';
 import ActivityFeed from '../components/ActivityFeed';
 import ActivityForm from '../components/ActivityForm';
 import ReplyForm from '../components/ReplyForm';
-
-
-// Cognito
-import { getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
+import checkAuth from '../lib/checkAuth';
 
 
 export default function HomeFeedPage() {
@@ -39,22 +36,6 @@ export default function HomeFeedPage() {
     }
   };
 
-  const checkAuth = async () => {
-    try {
-      const user = await getCurrentUser();
-      const attributes = await fetchUserAttributes();
-
-      console.log("user", user);
-      console.log("attributes", attributes);
-
-      setUser({
-        display_name: attributes.name || user.username,
-        handle: attributes.preferred_username || user.username,
-      });
-    } catch (err) {
-      console.log("Auth error:", err);
-    }
-  };
 
   React.useEffect(()=>{
     //prevents double call
@@ -62,7 +43,7 @@ export default function HomeFeedPage() {
     dataFetchedRef.current = true;
 
     loadData();
-    checkAuth();
+    checkAuth(setUser);
   }, [])
 
   return (

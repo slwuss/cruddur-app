@@ -25,8 +25,6 @@ Amplify.configure({
       region: process.env.REACT_APP_AWS_PROJECT_REGION,
       userPoolId: process.env.REACT_APP_AWS_USER_POOLS_ID,
       userPoolClientId: process.env.REACT_APP_AWS_USER_POOLS_WEB_CLIENT_ID,
-      // ถ้ามี identity pool ด้วย ก็ใส่เพิ่มได้แบบนี้:
-      // identityPoolId: process.env.REACT_APP_AWS_COGNITO_IDENTITY_POOL_ID,
     },
   },
 });

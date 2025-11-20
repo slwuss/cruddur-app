@@ -20,13 +20,17 @@ from services.show_activity import *
 # from aws_xray_sdk.core import xray_recorder
 # from aws_xray_sdk.ext.flask.middleware import XRayMiddleware
 
-from lib.jwt_helper import jwt_required
 from lib.db import db
 from lib.cognito_jwt_token import CognitoJwtToken, extract_access_token, TokenVerifyError
 
 # xray_url = os.getenv("AWS_XRAY_URL")
 # xray_recorder.configure(service='Cruddur', dynamic_naming=xray_url)
 
+cognito_jwt_token = CognitoJwtToken(
+  user_pool_id=os.getenv("COGNITO_USER_POOL_ID"), 
+  user_pool_client_id=os.getenv("COGNITO_USER_POOL_CLIENT_ID"),
+  region=os.getenv("REGION")
+)
 
 app = Flask(__name__)
 #XRay
@@ -36,13 +40,16 @@ frontend = os.getenv('FRONTEND_URL')
 backend = os.getenv('BACKEND_URL')
 origins = [frontend, backend]
 
+
 cors = CORS(
   app, 
   resources={r"/api/*": {"origins": origins}},
   headers=['Content-Type', 'Authorization'], 
   expose_headers='Authorization',
-  methods="OPTIONS,GET,HEAD,POST"
+  methods=["GET", "POST", "OPTIONS", "HEAD"]
 )
+
+
 
 
 @app.route("/api/message_groups", methods=['GET'])
