@@ -22,6 +22,9 @@ from services.show_activity import *
 
 from lib.db import db
 from lib.cognito_jwt_token import CognitoJwtToken, extract_access_token, TokenVerifyError
+from jose import jwt
+
+
 
 # xray_url = os.getenv("AWS_XRAY_URL")
 # xray_recorder.configure(service='Cruddur', dynamic_naming=xray_url)
@@ -35,6 +38,11 @@ cognito_jwt_token = CognitoJwtToken(
 app = Flask(__name__)
 #XRay
 # XRayMiddleware(app, xray_recorder)
+
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+app.logger.setLevel(logging.DEBUG)
 
 frontend = os.getenv('FRONTEND_URL')
 backend = os.getenv('BACKEND_URL')
@@ -55,6 +63,8 @@ cors = CORS(
 @app.route("/api/message_groups", methods=['GET'])
 def data_message_groups():
   access_token = extract_access_token(request.headers)
+  token_preview = access_token[:10] + "..." if access_token else "None"
+  app.logger.debug(f"Access token: {token_preview}")
   try:
     claims = cognito_jwt_token.verify(access_token)
     # authenicatied request
@@ -81,7 +91,7 @@ def data_messages(handle):
     return model['errors'], 422
   else:
     return model['data'], 200
-  return
+
 
 @app.route("/api/messages", methods=['POST','OPTIONS'])
 @cross_origin()
@@ -137,6 +147,7 @@ def data_home():
     app.logger.debug("unauthenicated")
     data = HomeActivities.run()
   return data, 200
+
 
 @app.route("/api/activities/notifications", methods=['GET'])
 def data_notifications():

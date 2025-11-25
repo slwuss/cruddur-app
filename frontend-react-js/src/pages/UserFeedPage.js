@@ -7,8 +7,6 @@ import DesktopSidebar     from '../components/DesktopSidebar';
 import ActivityFeed from '../components/ActivityFeed';
 import ActivityForm from '../components/ActivityForm';
 
-// [TODO] Authenication
-import Cookies from 'js-cookie'
 
 export default function UserFeedPage() {
   const [activities, setActivities] = React.useState([]);
@@ -22,8 +20,10 @@ export default function UserFeedPage() {
   const loadData = async () => {
     try {
       const backend_url = `${process.env.REACT_APP_BACKEND_URL}/api/activities/${title}`
+      const token = localStorage.getItem('access_token');
       const res = await fetch(backend_url, {
-        method: "GET"
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` }
       });
       let resJson = await res.json();
       if (res.status === 200) {

@@ -15,7 +15,7 @@ services:
       REGION: "ap-southeast-2"
       COGNITO_REGION: "ap-southeast-2"
       COGNITO_USER_POOL_ID: "ap-southeast-2_s92MIhNaz"
-      COGNITO_CLIENT_ID: "10airlpdi0n03qbipu48c61j87"
+      COGNITO_USER_POOL_CLIENT_ID: "10airlpdi0n03qbipu48c61j87"
     build: ./backend-flask
     ports:
       - "4567:4567"
