@@ -1,0 +1,21 @@
+#!/usr/bin/env python3
+
+import boto3
+import sys
+
+try:
+    ddb = boto3.client(
+        "dynamodb",
+        endpoint_url="http://dynamodb-local:8000",
+        region_name="ap-southeast-2",
+        aws_access_key_id="dummy",
+        aws_secret_access_key="dummy"
+    )
+
+    response = ddb.list_tables()
+    print("SUCCESS connected to DynamoDB")
+    print("Tables:", response.get("TableNames", []))
+
+except Exception as e:
+    print("FAILED to connect:", e)
+    sys.exit(1)

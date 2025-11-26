@@ -7,6 +7,7 @@ import botocore.exceptions
 
 class Ddb:
   def client():
+    region = os.getenv("REGION")
     endpoint_url = os.getenv("AWS_ENDPOINT_URL")
     if endpoint_url:
       attrs = { 'endpoint_url': endpoint_url }
