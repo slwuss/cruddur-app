@@ -2,13 +2,11 @@ import './MessageGroupPage.css';
 import React from "react";
 import { useParams } from 'react-router-dom';
 
+import checkAuth from '../lib/CheckAuth';
 import DesktopNavigation  from '../components/DesktopNavigation';
 import MessageGroupFeed from '../components/MessageGroupFeed';
 import MessagesFeed from '../components/MessageFeed';
 import MessagesForm from '../components/MessageForm';
-
-import checkAuth from '../lib/checkAuth';
-
 
 export default function MessageGroupPage() {
   const [messageGroups, setMessageGroups] = React.useState([]);
@@ -20,7 +18,7 @@ export default function MessageGroupPage() {
 
   const loadMessageGroupsData = async () => {
     try {
-      const backend_url = `${process.env.REACT_APP_BACKEND_URL}/api/activities/home`
+      const backend_url = `${process.env.REACT_APP_BACKEND_URL}/api/message_groups`
       const token = localStorage.getItem('access_token');
       const res = await fetch(backend_url, {
         method: "GET",
@@ -39,8 +37,7 @@ export default function MessageGroupPage() {
 
   const loadMessageGroupData = async () => {
     try {
-      const handle = `@${params.handle}`;
-      const backend_url = `${process.env.REACT_APP_BACKEND_URL}/api/messages/${handle}`
+      const backend_url = `${process.env.REACT_APP_BACKEND_URL}/api/messages/${params.message_group_uuid}`
       const token = localStorage.getItem('access_token');
       const res = await fetch(backend_url, {
         method: "GET",
@@ -56,8 +53,6 @@ export default function MessageGroupPage() {
       console.log(err);
     }
   };  
-
-
 
   React.useEffect(()=>{
     //prevents double call
