@@ -4,11 +4,11 @@ flask-cors
 opentelemetry-instrumentation
 opentelemetry-distro
 opentelemetry-exporter-otlp
-
+ 
 aws-xray-sdk
 
 requests
-python-jose[cryptography]
+python-jose[cryptography] 
 
 psycopg[binary]
 psycopg[pool]

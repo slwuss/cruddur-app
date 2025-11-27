@@ -1,4 +1,4 @@
-FROM python:3.10-slim-buster
+FROM 739623014075.dkr.ecr.ap-southeast-2.amazonaws.com/cruddur-python:3.10-slim-buster
 
 WORKDIR /backend-flask
 
@@ -11,7 +11,7 @@ RUN opentelemetry-bootstrap -a install
 
 COPY . .
 
-ENV FLASK_ENV=development
+ENV FLASK_DEBUG=1
 
 EXPOSE ${PORT}
 
