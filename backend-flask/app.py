@@ -42,9 +42,6 @@ app = Flask(__name__)
 
 import logging
 
-logging.basicConfig(level=logging.DEBUG)
-app.logger.setLevel(logging.DEBUG)
-
 frontend = os.getenv('FRONTEND_URL')
 backend = os.getenv('BACKEND_URL')
 origins = [frontend, backend]
@@ -64,6 +61,7 @@ def health_check():
   return {'success': True}, 200
 
 @app.route("/api/message_groups", methods=['GET'])
+@cross_origin()
 def data_message_groups():
   access_token = extract_access_token(request.headers)
   token_preview = access_token[:10] + "..." if access_token else "None"
@@ -190,7 +188,9 @@ def data_search():
 @app.route("/api/activities", methods=['POST','OPTIONS'])
 @cross_origin()
 def data_activities():
-  user_handle  = 'andrewbrown'
+  access_token = extract_access_token(request.headers)
+  claims = cognito_jwt_token.verify(access_token)
+  user_handle = claims["username"]
   message = request.json['message']
   ttl = request.json['ttl']
   model = CreateActivity.run(message, user_handle, ttl)

@@ -4,9 +4,10 @@ INSERT INTO public.activities (
   expires_at
 )
 VALUES (
-  (SELECT uuid 
+  (
+    SELECT uuid 
     FROM public.users 
-    WHERE users.handle = %(handle)s
+    WHERE LOWER(users.handle) = LOWER(%(handle)s)
     LIMIT 1
   ),
   %(message)s,
