@@ -3,8 +3,8 @@ import React from "react";
 import {ReactComponent as Logo} from '../components/svg/logo.svg';
 import { Link } from "react-router-dom";
 
-// [TODO] Authenication
-import Cookies from 'js-cookie'
+// Cognito
+import { signIn,fetchAuthSession } from 'aws-amplify/auth';
 
 export default function SigninPage() {
 
@@ -13,17 +13,37 @@ export default function SigninPage() {
   const [errors, setErrors] = React.useState('');
 
   const onsubmit = async (event) => {
+    setErrors('');
     event.preventDefault();
-    setErrors('')
-    console.log('onsubmit')
-    if (Cookies.get('user.email') === email && Cookies.get('user.password') === password){
-      Cookies.set('user.logged_in', true)
-      window.location.href = "/"
-    } else {
-      setErrors("Email and password is incorrect or account doesn't exist")
+    try {
+      const { isSignedIn, nextStep } = await signIn({
+        username: email,
+        password,
+      });
+      if (isSignedIn) {
+        const session = await fetchAuthSession();
+        const accessToken = session.tokens?.accessToken?.toString();
+        if (accessToken) {
+          localStorage.setItem('access_token', accessToken);
+          window.location.href = '/';
+        } else {
+          setErrors('Unable to get access token');
+        }
+      } else if (nextStep?.signInStep === 'CONFIRM_SIGN_UP') {
+        window.location.href = '/confirm';
+      } else {
+        console.log('Next step:', nextStep);
+        setErrors('Additional step required for sign-in');
+      }
+    } catch (error) {
+      if (error.name === 'UserNotConfirmedException') {
+        window.location.href = '/confirm';
+      } else {
+        console.error('Login error:', error);
+        setErrors(error.message || 'Login failed');
+      }
     }
-    return false
-  }
+  };
 
   const email_onchange = (event) => {
     setEmail(event.target.value);
@@ -50,7 +70,7 @@ export default function SigninPage() {
           <h2>Sign into your Cruddur account</h2>
           <div className='fields'>
             <div className='field text_field username'>
-              <label>Email</label>
+              <label>Email or Username</label>
               <input
                 type="text"
                 value={email}

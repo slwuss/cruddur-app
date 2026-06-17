@@ -1,0 +1,18 @@
+{
+	"image": "mcr.microsoft.com/devcontainers/universal:2",
+	"postCreateCommand": "bash .devcontainer/setup_postgres.sh",
+	"features": {
+		"ghcr.io/devcontainers/features/aws-cli:1": {}
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-azuretools.vscode-docker",
+				"42Crunch.vscode-openapi",
+				"Yseop.vscode-yseopml",
+				"cweijan.vscode-postgresql-client2"
+			]
+		}
+	}
+}	
+

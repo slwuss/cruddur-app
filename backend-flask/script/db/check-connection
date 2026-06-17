@@ -1,0 +1,5 @@
+import psycopg2, os
+
+conn = psycopg2.connect(os.getenv("CONNECTION_URL"))
+print("Connected!")
+conn.close()
